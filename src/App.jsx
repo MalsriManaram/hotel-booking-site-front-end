@@ -1,6 +1,3 @@
-import { Button } from "@/components/ui/button";
-import Greeting from "./Greeting";
-import { Switch } from "@/components/ui/switch"
 import Navigation from "@/components/Navigation";
 import Hero from "@/components/Hero";
 import HotelListings from "./components/HotelListings";
