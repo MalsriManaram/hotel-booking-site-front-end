@@ -3,6 +3,10 @@ import { createRoot } from "react-dom/client";
 import { BrowserRouter, Route, Routes } from "react-router";
 import "./index.css";
 
+// import redux store
+import { store } from "./lib/store";
+import { Provider } from "react-redux";
+
 // import pages
 import App from "./App.jsx";
 import HomePage from "./pages/home.page";
@@ -18,21 +22,25 @@ import AuthLayout from "./layouts/auth.layout";
 
 createRoot(document.getElementById("root")).render(
   <StrictMode>
-    <BrowserRouter>
-      <Routes>
-        <Route element={<RootLayout />}> 
-          <Route element={<MainLayout />} > 
-            <Route path="/" element={<HomePage />} />
-            <Route path="/hotels" element={<HotelsPage />} />
-            <Route path="/hotels/:id" element={<HotelPage />} />  
-            
+    <Provider store={store}>
+      <BrowserRouter>
+        <Routes>
+
+          <Route element={<RootLayout />}> 
+            <Route element={<MainLayout />} > 
+              <Route path="/" element={<HomePage />} />
+              <Route path="/hotels" element={<HotelsPage />} />
+              <Route path="/hotels/:id" element={<HotelPage />} />  
+            </Route>
+
+            <Route element={<AuthLayout />}> 
+              <Route path="/sign-in" element={<SignInPage />} />
+              <Route path="/sign-up" element={<SignUpPage />} />
+            </Route>
           </Route>
-          <Route element={<AuthLayout />}> 
-            <Route path="/sign-in" element={<SignInPage />} />
-            <Route path="/sign-up" element={<SignUpPage />} />
-          </Route>
-        </Route>
-      </Routes>
-    </BrowserRouter>
+
+        </Routes>
+      </BrowserRouter>
+    </Provider>
   </StrictMode>
 );

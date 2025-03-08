@@ -1,15 +1,15 @@
 export const getHotels = async () => {
-    try {
             const res = await fetch("http://localhost:8000/api/hotels", {
                 method: "GET",
             });
 
+            if (!res.ok) {
+                throw new Error("Failed to fetch hotels.");
+            }
+
             const data = await res.json();
             return data;
             
-        } catch (error) {
-            console.log(error); 
-        }
 
         // const res = fetch("http://localhost:8000/api/hotels", {
         //     method: "GET",

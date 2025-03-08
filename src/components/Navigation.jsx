@@ -2,7 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Globe } from "lucide-react";
 import { Link } from "react-router";
 
+import { useSelector } from "react-redux";
+
 function Navigation(p) {
+  const userSlice = useSelector((state) => state.user);
+  console.log(userSlice);
 
   return (
     <nav className="z-10 bg-black flex  items-center justify-between px-8 text-white py-4">
@@ -25,14 +29,14 @@ function Navigation(p) {
           <Globe className="h-5 w-5 mr-2" />
           EN
         </Button>
-        <Button variant="ghost" asChild>
+        {/* <Button variant="ghost" asChild>
           <Link to="/sign-in">Log In</Link>
         </Button>
         <Button asChild>
           <Link to="/sign-up">Sign Up</Link>
-        </Button>
+        </Button> */}
         <div>
-          {/* <p>{p.name}</p> */}
+          <p>{userSlice.user.name}</p>
         </div>
       </div>
     </nav>
