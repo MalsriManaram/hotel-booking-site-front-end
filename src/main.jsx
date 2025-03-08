@@ -17,6 +17,8 @@ import HotelPage from "./pages/hotel.page";
 import RootLayout from "./layouts/root-layout.layout";
 import MainLayout from "./layouts/main.layout";
 import AuthLayout from "./layouts/auth.layout";
+import CreateHotelPage from "./pages/create-hotel.page";
+
 
 
 
@@ -30,7 +32,8 @@ createRoot(document.getElementById("root")).render(
             <Route element={<MainLayout />} > 
               <Route path="/" element={<HomePage />} />
               <Route path="/hotels" element={<HotelsPage />} />
-              <Route path="/hotels/:id" element={<HotelPage />} />  
+              <Route path="/hotels/:id" element={<HotelPage />} /> 
+              <Route path="/hotels/create" element={<CreateHotelPage />} /> 
             </Route>
 
             <Route element={<AuthLayout />}> 
