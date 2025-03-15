@@ -37,7 +37,7 @@ const CreateHotelForm = () => {
 
     const handleSubmit = async (values) => {
         const { name, location, image, price, description } = values;
-        console.log(values);
+        // console.log(values);
         try {
             toast.loading("Creating hotel...");
             await createHotel({

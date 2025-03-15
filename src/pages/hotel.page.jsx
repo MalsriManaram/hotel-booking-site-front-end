@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useGetHotelByIdQuery } from "@/lib/api";
+import { useGetHotelByIdQuery, useCreateBookingMutation } from "@/lib/api";
 import {Coffee,MapPin, MenuIcon as Restaurant, Star,Tv, Wifi,} from "lucide-react";
 
 import { useParams } from "react-router";
@@ -10,6 +10,20 @@ import { Skeleton } from "@/components/ui/skeleton";
 export default function HotelPage() {
   const { id } = useParams();
   const { data: hotel, isLoading, isError, error } = useGetHotelByIdQuery(id);
+  const [createBooking, { isLoading: isCreateBookingLoading }] = useCreateBookingMutation();
+
+  const handleBook = async () => {
+    try {
+      await createBooking({ 
+        hotelId: id,
+        checkIn: new Date(),
+        checkOut: new Date(),
+        roomNumber: 200,
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
 
   if (isLoading)
     return (
@@ -131,7 +145,7 @@ export default function HotelPage() {
               <p className="text-2xl font-bold">${hotel.price}</p>
               <p className="text-sm text-muted-foreground">per night</p>
             </div>
-            <Button size="lg">Book Now</Button>
+            <Button size="lg" onClick={handleBook}>Book Now</Button>
           </div>
         </div>
       </div>
