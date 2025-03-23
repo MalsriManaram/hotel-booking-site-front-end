@@ -1,13 +1,12 @@
-import Navigation from "@/components/Navigation";
-import Hero from "@/components/Hero";
+import Navigation from "./components/Navigation";
+import Hero from "./components/Hero";
 import HotelListings from "./components/HotelListings";
-
 
 const App = () => {
 
   return (
     <>
-      <Navigation />
+      <Navigation name="Manupa" />
       <div className="relative min-h-screen">
         <Hero />
         <img
