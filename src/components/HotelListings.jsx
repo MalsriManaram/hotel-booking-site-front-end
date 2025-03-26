@@ -1,4 +1,5 @@
 import { useState} from "react";
+import { motion } from "framer-motion";
 
 // components
 import HotelCard from "./HotelCard";
@@ -8,22 +9,22 @@ import LocationTab from "./LocationTab";
 // hooks
 import { useSelector } from "react-redux";
 import { useGetHotelsForSearchQueryQuery } from "@/lib/api";
+import { Skeleton } from "./ui/skeleton";
 
 
 export default function HotelListings() {
-  
+
   // get the search value from the store
   const searchValue = useSelector((state) => state.search.value);
+
+  const locations = ["ALL", "France", "Italy", "Australia", "Japan"];// state for the selected location
+  const [selectedLocation, setSelectedLocation] = useState("ALL");
 
   // use the useGetHotelForSearchQueryQuery hook to fetch the searched hotels
   const { data: hotels, isLoading, isError, error } = useGetHotelsForSearchQueryQuery({
     query: searchValue,
+    location: selectedLocation === "ALL" ? null : selectedLocation,
   });
-
-  // state for the selected location
-  const locations = ["ALL", "France", "Italy", "Australia", "Japan"]
-  const [selectedLocation, setSelectedLocation] = useState("ALL");
-
 
   // function to handle the selected location
   const handleSelectedLocation = (location) => {
@@ -56,7 +57,14 @@ export default function HotelListings() {
           })}
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-4">
-          <p>Loading...</p>
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="space-y-4">
+              <Skeleton className="h-48 w-full rounded-lg" />
+              <Skeleton className="h-4 w-3/4" />
+              <Skeleton className="h-4 w-1/2" />
+              <Skeleton className="h-4 w-1/4" />
+            </div>
+          ))}
         </div>
       </section>
     );
@@ -100,7 +108,6 @@ export default function HotelListings() {
   });
 
  
-  
 
   return (
     <section className="px-8 py-8 lg:py-16">
@@ -115,19 +122,25 @@ export default function HotelListings() {
           experience.
         </p>
       </div>
-      <div className="flex items-center gap-x-4">
+      <div className="flex items-center gap-x-1 md:gap-x-4">
         {
           locations.map((location, i) => {
             return (<LocationTab key={i} selectedLocation={selectedLocation} name={location} onClick={handleSelectedLocation} />)
           })
         }
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-4">
-        {
-          filteredHotels.map(({hotel, confidence}) => {
-            return (<HotelCard key={hotel._id} hotel={hotel} confidence={confidence} />)
-          })
-        }
+      <div key={selectedLocation} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-4">
+        {filteredHotels?.length > 0 &&
+          filteredHotels.map(({ hotel, confidence }, index) => (
+            <motion.div
+              key={index} 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <HotelCard hotel={hotel} confidence={confidence} />
+            </motion.div>
+          ))}
       </div>
     </section>
   );

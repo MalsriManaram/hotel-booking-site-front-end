@@ -1,23 +1,70 @@
-import Navigation from "./components/Navigation";
-import Hero from "./components/Hero";
-import HotelListings from "./components/HotelListings";
+import { BrowserRouter, Route, Routes } from "react-router";
+import "./index.css";
+
+// import redux store
+import { store } from "./lib/store";
+import { Provider } from "react-redux";
+
+// import clerk provider
+import { ClerkProvider } from "@clerk/clerk-react";
+
+//import layouts
+import RootLayout from "./layouts/root-layout.layout";
+import MainLayout from "./layouts/main.layout";
+import ProtectedLayout from "./layouts/protected.layout";
+import AdminProtectedLayout from "./layouts/admin-protected.layout";
+
+// import pages
+import HomePage from "./pages/home.page";
+import SignInPage from "./pages/sign-in.page";
+import SignUpPage from "./pages/sign-up.page";
+import HotelsPage from "./pages/hotels.page";
+import HotelPage from "./pages/hotel.page";
+import CreateHotelPage from "./pages/create-hotel.page";
+import AccountPage from "./pages/account-page";
+
+
+const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
+
+if(!PUBLISHABLE_KEY) {
+  throw new Error("Add your Clerk Publishable Key to .env.local file");
+}
 
 const App = () => {
+   return(
+    <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
+      <Provider store={store}>
+        <BrowserRouter>
+          <Routes>
 
-  return (
-    <>
-      <Navigation name="Manupa" />
-      <div className="relative min-h-screen">
-        <Hero />
-        <img
-          src="/assets/hero/hero_1.jpg"
-          alt=""
-          className="absolute top-0 left-0 w-full h-full object-cover -z-10"
-        />
-      </div>
-      <HotelListings />
-    </>
-  );
+            <Route element={<RootLayout />}> 
+              <Route element={<MainLayout />} > 
+
+                <Route path="/" element={<HomePage />} />
+                <Route path="/hotels" element={<HotelsPage />} />
+                <Route path="/hotels/:id" element={<HotelPage />} /> 
+
+
+                <Route element={<ProtectedLayout />}>
+                  <Route path="/account" element={<AccountPage />} />
+                  
+                </Route>
+
+                <Route element={<AdminProtectedLayout />}>
+                  <Route path="/hotels/create" element={<CreateHotelPage />} /> 
+                </Route>
+
+                <Route path="/sign-in" element={<SignInPage />} />
+                <Route path="/sign-up" element={<SignUpPage />} />
+
+              </Route>
+            </Route>
+
+          </Routes>
+        </BrowserRouter>
+      </Provider>
+    </ClerkProvider>
+   );
 };
 
 export default App;
