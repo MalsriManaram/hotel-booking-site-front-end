@@ -44,7 +44,7 @@ export default function HotelListings() {
             experience.
           </p>
         </div>
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-1 md:gap-x-4">
           {locations.map((location, i) => {
             return (
               <LocationTab
@@ -82,7 +82,7 @@ export default function HotelListings() {
             experience.
           </p>
         </div>
-        <div className="flex items-center gap-x-4">
+        <div className="flex items-center gap-x-1 md:gap-x-4">
           {locations.map((location, i) => {
             return (
               <LocationTab

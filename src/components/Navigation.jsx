@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Globe, Menu, X } from "lucide-react"; 
 import { Link } from "react-router";
 import { useUser } from "@clerk/clerk-react";
+import logo from "/assets/hero/logo.png";
 
 
 
@@ -18,7 +19,7 @@ function Navigation() {
     <nav className="z-10 bg-[#000000] flex  items-center justify-between px-8 text-white py-5">
       <div className="flex items-center space-x-9">
       <Link to="/" className="text-2xl font-bold flex items-center space-x-3 transition-transform duration-300 ease-in-out hover:scale-105 ">
-        <img className="h-12 w-auto md:h-10 lg:h-12 transition duration-300 ease-in-out  hover:shadow-lg hover:shadow-yellow-500/50 hover:brightness-110" src="assets/hero/logo.png" alt="StayLux Icon" />
+        <img className="h-12 w-auto md:h-10 lg:h-12 transition duration-300 ease-in-out  hover:shadow-lg hover:shadow-yellow-500/50 hover:brightness-110" src={logo} alt="StayLux Icon" />
         <span className="hidden md:block ">StayLux</span>
       </Link>
       

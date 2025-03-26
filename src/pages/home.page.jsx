@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import React from "react";
 import Hero from "@/components/Hero";
 import HotelListings from "@/components/HotelListings";
+import coverImage from "/assets/hero/cover_image.jpg";
 
 const HomePage = () => {
   return (
@@ -16,7 +17,7 @@ const HomePage = () => {
         </motion.div>
         
         <img
-          src="/assets/hero/cover_image.jpg"
+          src={coverImage}
           alt=""
           className="absolute top-0 left-0 w-full h-4/5 object-cover -z-10"
         />
