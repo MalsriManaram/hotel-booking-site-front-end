@@ -33,7 +33,7 @@ const HeroForm = () => {
         });
 
     const handleSubmit = async (values) => {
-        const { name, location, image, price, description } = values;
+        const { description, rating, location, price } = values;
         try {
             toast.loading("Creating hotel...");
             await createHotel({
@@ -52,7 +52,7 @@ const HeroForm = () => {
         <main>
             <Form {...form} >
                 <form action="" onSubmit={form.handleSubmit(handleSubmit)}>
-                    <div className="grid md:grid-flow-col md:grid-rows-1 gap-4 items-center p-5 mt-14 md:mt-8 md:mb-20 lg:mb-12 rounded-md w-full max-w-7xl min-w-80 h-fit md:h-32 bg-gray-100 drop-shadow-xl">
+                    <div className="grid md:grid-flow-col md:grid-rows-1 gap-4 items-center p-5 mt-40 md:mt-8 md:mb-20 lg:mb-12 w-full max-w-7xl min-w-[350px] h-fit md:h-32 bg-gray-100 drop-shadow-xl">
                     <FormField
                         control={form.control}
                         name="description"
