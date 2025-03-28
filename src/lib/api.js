@@ -19,7 +19,11 @@ export const api = createApi({
       query: () => "hotels",
     }),
     getHotelsForSearchQuery: builder.query({
-      query: ({ query }) => `hotels/search/retrieve?query=${query}`,
+      query: ({ description, rating, location, price }) => ({
+        url: "hotels/search/retrieve",
+        method: "GET",
+        params: { description, rating, location, price },
+      }),
     }),
     getHotelById: builder.query({
       query: (id) => `hotels/${id}`,

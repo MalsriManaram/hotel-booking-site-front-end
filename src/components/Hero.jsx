@@ -18,27 +18,6 @@ export default function Hero() {
 
         {/* Search Form */}
         <HeroForm />
-        {/* <form
-          onSubmit={handleSearch}
-          className="w-full max-w-3xl bg-black/10  backdrop-blur-md lg:h-16 rounded-full p-2 flex items-center"
-        >
-          <Input
-            type="text"
-            name="search"
-            placeholder="Describe your destination, experience, or hotel..."          
-            className="flex-grow  bg-transparent lg:text-lg  text-white placeholder:text-white/50 border-none outline-none focus:border-none focus:outline-none focus-visible:ring-0"
-          />
-          <Button
-            type="submit"
-            className="rounded-full w-48 flex items-center gap-x-2 lg:h-12"
-          >
-            <Sparkles
-              style={{ width: "20px", height: "20px" }}
-              className=" mr-2 animate-pulse text-sky-400"
-            />
-            <span className="lg:text-lg">AI Search</span>
-          </Button>
-        </form> */}
       </div>
     </div>
   );

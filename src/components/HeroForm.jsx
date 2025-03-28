@@ -1,9 +1,9 @@
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
-import { useCreateHotelMutation } from "@/lib/api";
 import { Sparkles } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { submit } from "@/lib/features/searchSlice";
 
 import { Button } from "@/components/ui/button"
 import {
@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 
- 
+// form validation schema
 const formSchema = z.object({
   description: z.string().min(1, { message: "Your description is required" }),
   rating: z.number().min(1, { message: "Rating is required" }).max(5, { message: "Rating cannot be more than 5" }),
@@ -26,32 +26,22 @@ const formSchema = z.object({
 
 const HeroForm = () => {
 
-    const [createHotel, { isLoading }] = useCreateHotelMutation();
-
     const form = useForm ({
             resolver: zodResolver(formSchema),
         });
 
-    const handleSubmit = async (values) => {
-        const { description, rating, location, price } = values;
-        try {
-            toast.loading("Creating hotel...");
-            await createHotel({
-                description,
-                rating,
-                location,
-                price,
-            }).unwrap();
-            toast.success("Hotel created successfully");
-        } catch (error) {
-            toast.error("Failed to create hotel");
-        }
-    };
+        const dispatch = useDispatch();
+        
+        /// function to handle the search form submission
+        const handleSearch = (data) => {
+            dispatch(submit(data)); 
+        };
+          
 
     return (
         <main>
             <Form {...form} >
-                <form action="" onSubmit={form.handleSubmit(handleSubmit)}>
+                <form action="" onSubmit={form.handleSubmit(handleSearch)}>
                     <div className="grid md:grid-flow-col md:grid-rows-1 gap-4 items-center p-5 mt-40 md:mt-8 md:mb-20 lg:mb-12 w-full max-w-7xl min-w-[350px] h-fit md:h-32 bg-gray-100 drop-shadow-xl">
                     <FormField
                         control={form.control}
@@ -79,7 +69,7 @@ const HeroForm = () => {
                                         max="5"
                                         className="h-12 lg:text-lg text-black placeholder:text-gray-500 border-none outline-none focus:border-none focus:outline-none focus-visible:ring-0"
                                         onChange={(e) => {
-                                        field.onChange(parseFloat(e.target.value));
+                                        field.onChange(parseFloat(e.target.value)|| 0);
                                     }} 
                                     value={field.value}
                                 />
@@ -113,7 +103,7 @@ const HeroForm = () => {
                                     step="0.01"
                                     className="h-12 lg:text-lg text-black placeholder:text-gray-500 border-none outline-none focus:border-none focus:outline-none focus-visible:ring-0"
                                     onChange={(e) => {
-                                    field.onChange(parseFloat(e.target.value));
+                                    field.onChange(parseFloat(e.target.value)|| 0);
                                 }} 
                                 value={field.value}
                                 />
