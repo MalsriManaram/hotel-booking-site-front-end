@@ -262,12 +262,19 @@ const BookingDialog = ({ hotel}) => {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="overflow-y-auto h-80" >
-                    <Calendar className="p-0"
-                        mode="single" 
-                        selected={field.value} 
-                        onSelect={field.onChange}
-                        fromDate={new Date()}
-                        disabled={(date) =>  departureDate && date > departureDate }
+                    <Calendar
+                      className="p-0"
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      fromDate={new Date()}
+                      disabled={(date) => departureDate && date > departureDate}
+                      modifiers={{
+                        booked: bookedDates,
+                      }}
+                      modifiersClassNames={{
+                        booked: "text-red-600 pointer-events-none",  
+                      }}
                     />
                     </PopoverContent>
                   </Popover>
@@ -286,14 +293,19 @@ const BookingDialog = ({ hotel}) => {
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="overflow-y-auto h-80">
-                    <Calendar className="p-0"
-                        mode="single" 
-                        selected={field.value} 
-                        onSelect={field.onChange}
-                        fromDate={arrivalDate ? new Date(arrivalDate.getTime() + 86400000) : new Date()}
-                        disabled={(date) => 
-                            date <= new Date() || (arrivalDate && date <= arrivalDate)
-                        }
+                    <Calendar
+                      className="p-0"
+                      mode="single"
+                      selected={field.value}
+                      onSelect={field.onChange}
+                      fromDate={arrivalDate ? new Date(arrivalDate.getTime() + 86400000) : new Date()}
+                      disabled={(date) => date <= new Date() || (arrivalDate && date <= arrivalDate)}
+                      modifiers={{
+                        booked: bookedDates,
+                      }}
+                      modifiersClassNames={{
+                        booked: "text-red-600 pointer-events-none",  
+                      }}
                     />
                     </PopoverContent>
                   </Popover>
@@ -303,7 +315,7 @@ const BookingDialog = ({ hotel}) => {
             </div>
 
             {/* Room Type & Guests */}
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4" >
               <FormField name="roomType" control={form.control} render={({ field }) => (
                 <FormItem>
                   <FormLabel>Room Type</FormLabel>
