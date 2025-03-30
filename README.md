@@ -1,6 +1,6 @@
 ﻿## 🏨 AI-Driven Hotel Booking System (MERN + Vite)
 
-An advanced AI-powered hotel booking system built with the MERN stack (MongoDB, Express, React, Node.js) and Vite for lightning-fast performance. This system streamlines hotel reservations with AI-driven recommendations, personalized user experiences, and smart booking management.
+An advanced AI-powered hotel booking system built with the MERN stack (MongoDB, Express, React, Node.js) and Vite for lightning-fast performance. This system streamlines hotel reservations with AI-driven search function, personalized user experiences, and smart booking management.
 
 ## ✨ Features
 AI-Powered Hotel Recommendations 🧠🔍
