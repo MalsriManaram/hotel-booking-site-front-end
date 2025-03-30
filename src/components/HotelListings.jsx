@@ -12,7 +12,7 @@ import { useGetHotelsForSearchQueryQuery } from "@/lib/api";
 import { Skeleton } from "./ui/skeleton";
 
 
-export default function HotelListings() {
+const HotelListings = () => {
 
   // get the search value from the store
   const searchData = useSelector((state) => state.search.searchData);
@@ -158,3 +158,5 @@ export default function HotelListings() {
     </section>
   );
 };
+
+export default HotelListings;

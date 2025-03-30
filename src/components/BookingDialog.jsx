@@ -5,7 +5,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import { CalendarIcon } from "lucide-react";
-import { useCreateBookingMutation } from "@/lib/api";
+import { useCreateBookingMutation, useGetBookingsbyHotelIdQuery} from "@/lib/api";
 import { useUser } from "@clerk/clerk-react";
 import { Navigate} from "react-router";
 
@@ -35,14 +35,20 @@ const bookingSchema = z.object({
     path: ["departureDate"]
   });
 
-export default function BookingDialog({ hotel}) {
-  const [open, setOpen] = useState(false);
+const BookingDialog = ({ hotel}) => {
   const [price, setPrice] = useState(0);
   const [redirect, setRedirect] = useState(false);
+  const [bookedDates, setBookedDates] = useState([]);
+  
+  const { isSignedIn} = useUser();
+
+  const hotelId = hotel?._id;
 
   const [createBooking, { isLoading }] = useCreateBookingMutation();
 
-  const { isSignedIn } = useUser();
+  const { data } = useGetBookingsbyHotelIdQuery(hotelId);
+
+  const bookings = data?.bookings || []; 
 
   const form = useForm({
     resolver: zodResolver(bookingSchema),
@@ -67,7 +73,7 @@ export default function BookingDialog({ hotel}) {
   const roomType = watch("roomType");
 
   // Calculate price
-  const { setValue } = form; // Get form instance
+  const { setValue } = form;
   useEffect(() => {
     if (arrivalDate && departureDate && roomType && hotel) {
       const diffInDays = Math.ceil((departureDate - arrivalDate) / (1000 * 3600 * 24));
@@ -75,12 +81,28 @@ export default function BookingDialog({ hotel}) {
         const roomPrice = hotel.price || 0;
         const totalPrice = diffInDays * roomPrice;
         setPrice(totalPrice);
-        setValue("price", totalPrice); // Update form value
+        setValue("price", totalPrice);
       }
     }
+
+   
   }, [arrivalDate, departureDate, roomType, hotel, setValue]);
 
-
+  useEffect(() => {
+    if (bookings?.length) {
+      const booked = bookings.flatMap((booking) => {
+        const start = new Date(booking.arrivalDate);
+        const end = new Date(booking.departureDate);
+        let dates = [];
+        while (start <= end) {
+          dates.push(new Date(start));
+          start.setDate(start.getDate() + 1);
+        }
+        return dates;
+      });
+      setBookedDates(booked);
+    }
+  }, [bookings]); 
 
   const onSubmit = async (values) => {
 
@@ -118,21 +140,67 @@ export default function BookingDialog({ hotel}) {
   const handleBookNowClick = () => {
     if (!isSignedIn) {
       setRedirect(true);
-    } else {
-      setOpen(true);
-    }
+    } 
   };
 
   // Redirect to the login page if needed
   if (redirect) {
     return <Navigate to="/sign-in" />;
   }
+
+  // Check if the selected date is booked
+  const isDateBooked = (date) => bookedDates.some((booked) => booked.toDateString() === date.toDateString());
+
+  // Check if the selected date is in the past
+  const isPastDate = (date) => date < new Date();
+
+
+
+  
+
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog>
+
       <DialogTrigger asChild>
+      <span>
         <Button size="lg" onClick={handleBookNowClick}>Book Now</Button>
+      </span>
       </DialogTrigger>
-      <DialogContent className="max-w-xl overflow-y-auto w-11/12 h-5/6 md:h-[640px] md:w-fit rounded-md">
+
+      <DialogContent className="grid grid-row-1 md:grid-cols-5 overflow-y-auto md:max-w-5xl w-11/12 h-5/6 md:h-[640px] md:w-full rounded-md">
+        {/* Availability Calendar */}
+        <div className="w-full px-2 py-1 md:col-span-2 md:border-0 border-b-2 pb-6 md:pb-0 border-gray-300">
+          <DialogHeader>
+              <DialogTitle className="text-xl font-bold">Hotel Booking Calander</DialogTitle>
+              <DialogDescription className="text-sm text-muted-foreground">
+                Check, If the booking datas are available.
+              </DialogDescription>
+          </DialogHeader>
+          <div className="flex flex-col md:items-start items-center gap-2 mt-3">
+              <Calendar
+                mode="single"
+                className="shadow-md rounded-md lg:w-full lg:h-full lg:p-14"
+                disabled={isDateBooked}
+                modifiers={{
+                  booked: bookedDates,
+                  available: (date) => !isDateBooked(date) && !isPastDate(date),
+                  past: isPastDate,
+                }}
+                modifiersClassNames={{
+                  booked: "w-[33px] h-[33px] bg-red-600 text-white pointer-events-none",
+                  available: "w-[33px] h-[33px] bg-green-500 text-white rounded-full pointer-events-none",
+                  past: "w-[33px] h-[33px] bg-white text-gray-200  pointer-events-none",
+                }}
+            />
+          <p className="text-black text-md font-semibold">Available Nights : 🟩</p>
+          <p className="text-black text-md font-semibold">Booked Nights : 🟥</p>
+
+          </div>
+        </div>
+
+
+      <div className="w-full md:col-span-3 md:border-l-2 md:pl-6 border-gray-300">
+      {/* Booking Form */}
         <DialogHeader>
             <DialogTitle className="text-xl font-bold">Book Your Stay</DialogTitle>
             <DialogDescription className="text-sm text-muted-foreground">
@@ -141,7 +209,7 @@ export default function BookingDialog({ hotel}) {
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4 mt-4">
 
             {/* Name Fields */}
             <div className="grid grid-cols-2 gap-4">
@@ -296,15 +364,18 @@ export default function BookingDialog({ hotel}) {
             )} />
 
             {/* Submit Button */}
-            <DialogFooter>
+            <DialogFooter className="flex flex-col md:flex-row w-full justify-between items-center gap-2">
               {/* Price */}
-                <p className="text-lg text-black font-bold text-center md:text-left md:w-full">Price: ${price}</p>
-              <DialogClose asChild><Button variant="outline">Close</Button></DialogClose>
-              <Button type="submit" disabled={isLoading}>{isLoading ? "Booking..." : "Submit Booking"}</Button>
+              <p className="text-lg text-black font-bold text-center md:text-left md:w-full">Price: ${price}</p>
+              <DialogClose className="w-full md:w-fit" asChild><Button variant="outline">Close</Button></DialogClose>
+              <Button className="w-full md:w-fit" type="submit" disabled={isLoading}>{isLoading ? "Booking..." : "Submit Booking"}</Button>
             </DialogFooter>
           </form>
         </Form>
+        </div>
       </DialogContent>
     </Dialog>
   );
 }
+
+export default BookingDialog;

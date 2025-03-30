@@ -8,7 +8,7 @@ export const api = createApi({
     baseUrl: `${BACKEND_URL}/api/`,
     prepareHeaders: async (headers, { getState }) => {
       const token = await window?.Clerk?.session?.getToken();
-      console.log(token);
+      // console.log(token);
       if (token) {
         headers.set("Authorization", `Bearer ${token}`);
       }
@@ -28,6 +28,12 @@ export const api = createApi({
     getHotelById: builder.query({
       query: (id) => `hotels/${id}`,
     }),
+    getBookingsbyUserId: builder.query({
+      query: (userId) => `bookings/users/${userId}`,
+    }),
+    getBookingsbyHotelId: builder.query({
+      query: (hotelId) => `bookings/hotels/${hotelId}`,
+    }),
     createHotel: builder.mutation({
       query: (hotel) => ({
         url: "hotels",
@@ -42,6 +48,13 @@ export const api = createApi({
         body: booking,
       }),
     }),
+    cancelBooking: builder.mutation({
+      query: (booking) => ({
+        url: `bookings/cancel`,
+        method: "POST",
+        body: booking,
+      }),
+    }),
   }),
 });
 
@@ -49,6 +62,9 @@ export const {
   useGetHotelsQuery,
   useGetHotelsForSearchQueryQuery,
   useGetHotelByIdQuery,
+  useGetBookingsbyUserIdQuery,
+  useGetBookingsbyHotelIdQuery,
   useCreateHotelMutation,
   useCreateBookingMutation,
+  useCancelBookingMutation
 } = api;

@@ -1,7 +1,7 @@
 import HeroForm from "./HeroForm";
 
 
-export default function Hero() {
+const Hero = () => {
 
 
   return (
@@ -22,3 +22,5 @@ export default function Hero() {
     </div>
   );
 }
+
+export default Hero;

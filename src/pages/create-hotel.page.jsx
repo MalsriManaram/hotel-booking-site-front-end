@@ -1,12 +1,17 @@
 import CreateHotelForm from "@/components/CreateHotelForm";
+import { motion } from "framer-motion";
 
 export default function CreateHotelPage() {
 
     return ( 
-        <main className="container mx-auto px-4 py-8 min-h-screen">
+        <motion.main
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.8, ease: "easeOut" }}
+        className="container mx-auto px-4 py-8 min-h-screen">
             <h1 className="text-2xl md:text-4xl font-bold mb-4">Create a Hotel</h1>
             <CreateHotelForm />
-        </main>
+        </motion.main>
      );
 };
 

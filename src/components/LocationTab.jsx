@@ -1,4 +1,4 @@
-function LocationTab(props) {
+const LocationTab = (props) => {
 
     const handleClick = () => {
         props.onClick(props.name); // handleSelectLocation(props.name)
