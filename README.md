@@ -3,12 +3,10 @@
 An advanced AI-powered hotel booking system built with the MERN stack (MongoDB, Express, React, Node.js) and Vite for lightning-fast performance. This system streamlines hotel reservations with AI-driven search function, personalized user experiences, and smart booking management.
 
 ## ✨ Features
-AI-Powered Hotel Recommendations 🧠🔍
-Seamless Room Booking & Management 🏠📅
+AI-Powered Hotel Search function 🧠🔍
 Secure Authentication & User Roles 🔐
-Intelligent Pricing Suggestions 💰📊
 Fast & Optimized UI with Vite ⚡
-Payment Gateway Integration 💳
+
 
 ## 🚀 Tech Stack
 Frontend: React, Vite, Tailwind CSS
