@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 
-// const BACKEND_URL ="http://localhost:8000/api";
-// "https://stay-hotel-booking-site-backend-malsri.vercel.app/api/"
+const BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/api/";
+
 export const api = createApi({
   baseQuery: fetchBaseQuery({
-    baseUrl: "https://stay-hotel-booking-site-backend-malsri.vercel.app/api/",
+    baseUrl: BACKEND_URL,
     prepareHeaders: async (headers, { getState }) => {
       const token = await window.Clerk?.session?.getToken();
       if (token) {
