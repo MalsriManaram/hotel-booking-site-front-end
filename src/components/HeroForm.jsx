@@ -42,7 +42,7 @@ const HeroForm = () => {
         <main>
             <Form {...form} >
                 <form action="" onSubmit={form.handleSubmit(handleSearch)}>
-                    <div className="grid md:grid-flow-col md:grid-rows-1 gap-4 items-center p-5 mt-40 md:mt-8 md:mb-20 lg:mb-12 w-full max-w-7xl min-w-[350px] h-fit md:h-32 bg-gray-100 drop-shadow-xl rounded-2xl">
+                    <div className="grid md:grid-flow-col md:grid-rows-1 gap-4 items-center p-5 mt-40 md:mt-8 md:mb-20 lg:mb-12 w-full max-w-7xl min-w-[350px] h-fit md:h-32 bg-gray-100 drop-shadow-xl rounded-xl">
                     <FormField
                         control={form.control}
                         name="description"
