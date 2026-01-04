@@ -1,49 +1,57 @@
-import { useState} from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
 
 // components
 import HotelCard from "./HotelCard";
 import LocationTab from "./LocationTab";
 
-
 // hooks
 import { useSelector } from "react-redux";
 import { useGetHotelsForSearchQueryQuery } from "@/lib/api";
 import { Skeleton } from "./ui/skeleton";
 
-
 const HotelListings = () => {
-
   // get the search value from the store
   const searchData = useSelector((state) => state.search.searchData);
 
-  const locations = ["ALL", "France", "Italy", "Australia", "Japan"];// state for the selected location
+  const locations = ["ALL", "France", "Italy", "Australia", "Japan"];
   const [selectedLocation, setSelectedLocation] = useState("ALL");
 
-
   const { description, rating, location: searchLocation, price } = searchData;
-  const locationForQuery = selectedLocation === "ALL" ? null : selectedLocation;
 
-  const { data: hotels, isLoading, isError, error } = useGetHotelsForSearchQueryQuery({
+  // logic to fetch hotels based on search criteria
+  const locationForQuery =
+    selectedLocation === "ALL" ? undefined : selectedLocation;
+
+  const {
+    data: hotels,
+    isLoading,
+    isError,
+    error,
+  } = useGetHotelsForSearchQueryQuery({
     description,
     rating,
-    location: searchLocation || locationForQuery, 
+    location: searchLocation || locationForQuery,
     price,
   });
-  
+
   // function to handle the selected location
   const handleSelectedLocation = (location) => {
     setSelectedLocation(location);
   };
 
-    // filter the hotels based on the selected location
-    const hotelList = hotels?.data || hotels || []; 
-    const filteredHotels = selectedLocation === "ALL" ? hotelList : hotelList.filter(({ hotel }) =>{
-      return hotel.location.toLowerCase().includes(searchLocation?.toLowerCase() || selectedLocation.toLowerCase()); // uses includes() to check if the location string contains the selectedLocation string we get from the LocationTab component
-                                                                                    // ex: "Paris, France".includes("France") returns true
-    });
-
-
+  // filter the hotels based on the selected location
+  const hotelList = hotels?.data || hotels || [];
+  const filteredHotels =
+    selectedLocation === "ALL"
+      ? hotelList
+      : hotelList.filter(({ hotel }) => {
+          return hotel.location
+            .toLowerCase()
+            .includes(
+              searchLocation?.toLowerCase() || selectedLocation.toLowerCase()
+            );
+        });
 
   // if the data is loading, return a loading UI
   if (isLoading) {
@@ -83,7 +91,7 @@ const HotelListings = () => {
       </section>
     );
   }
-  // if there is an error, return a error UI 
+  // if there is an error, return a error UI
   if (isError) {
     return (
       <section className="px-8 py-8 lg:py-16">
@@ -115,12 +123,9 @@ const HotelListings = () => {
     );
   }
 
-
-
   return (
     <section className="px-8 py-8 lg:py-16">
       <div className="mb-12">
-
         <h2 className="text-3xl md:text-4xl font-bold mb-4">
           Top trending hotels worldwide
         </h2>
@@ -131,13 +136,21 @@ const HotelListings = () => {
         </p>
       </div>
       <div className="flex items-center gap-x-1 md:gap-x-4">
-        {
-          locations.map((location, i) => {
-            return (<LocationTab key={i} selectedLocation={selectedLocation} name={location} onClick={handleSelectedLocation} />)
-          })
-        }
+        {locations.map((location, i) => {
+          return (
+            <LocationTab
+              key={i}
+              selectedLocation={selectedLocation}
+              name={location}
+              onClick={handleSelectedLocation}
+            />
+          );
+        })}
       </div>
-      <div key={selectedLocation} className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-4">
+      <div
+        key={selectedLocation}
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-4"
+      >
         {filteredHotels?.length > 0 ? (
           filteredHotels.map(({ hotel, confidence }, index) => (
             <motion.div
