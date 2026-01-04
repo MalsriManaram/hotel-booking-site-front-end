@@ -21,6 +21,8 @@ import SignUpPage from "./pages/sign-up.page";
 import HotelPage from "./pages/hotel.page";
 import CreateHotelPage from "./pages/create-hotel.page";
 import AccountPage from "./pages/account-page";
+import ContactUs from "./pages/contact-us.page";
+import AboutUs from "./pages/about-us.page";
 
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
@@ -41,6 +43,8 @@ const App = () => {
 
                 <Route path="/" element={<HomePage />} />
                 <Route path="/hotels/:id" element={<HotelPage />} /> 
+                <Route path="/about-us" element={<AboutUs />} />
+                <Route path="/contact-us" element={<ContactUs />} />
 
 
                 <Route element={<ProtectedLayout />}>

@@ -31,6 +31,8 @@ const Footer = () => {
                 {user?.publicMetadata?.role === "admin" && (
                     <li><Link to={`/hotels/create`} className="hover:text-white">Create Hotel</Link></li>
                 )}
+              <li><Link to={`/about-us`} className="hover:text-white">About Us</Link></li>
+              <li><Link to={`/contact-us`} className="hover:text-white">Contact Us</Link></li>
             </ul>
           </div>
 

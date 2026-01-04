@@ -52,6 +52,24 @@ function Navigation() {
               Create Hotel
             </Link>
           )}
+                    <Link 
+            to={`/about-us`} 
+            className="relative text-gray-300 transition-colors duration-300 hover:text-white font-semibold
+                      after:content-[''] after:absolute after:left-0 after:bottom-0 
+                      after:w-0 after:h-[2px] after:bg-white after:transition-all 
+                      after:duration-300 hover:after:w-full"
+          >
+            About Us
+          </Link>
+                    <Link 
+            to={`/contact-us`} 
+            className="relative text-gray-300 transition-colors duration-300 hover:text-white font-semibold
+                      after:content-[''] after:absolute after:left-0 after:bottom-0 
+                      after:w-0 after:h-[2px] after:bg-white after:transition-all 
+                      after:duration-300 hover:after:w-full"
+          >
+            Contact Us
+          </Link>
         </div>
       </div>
 

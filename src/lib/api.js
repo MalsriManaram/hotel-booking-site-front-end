@@ -1,7 +1,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
-
-const BACKEND_URL =  import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/api/";
+const BACKEND_URL =
+  import.meta.env.VITE_BACKEND_URL || "http://localhost:8000/api/";
 
 export const api = createApi({
   baseQuery: fetchBaseQuery({
@@ -56,6 +56,13 @@ export const api = createApi({
         body: booking,
       }),
     }),
+    createContact: builder.mutation({
+      query: (contact) => ({
+        url: "contacts",
+        method: "POST",
+        body: contact,
+      }),
+    }),
   }),
 });
 
@@ -67,5 +74,6 @@ export const {
   useGetBookingsbyHotelIdQuery,
   useCreateHotelMutation,
   useCreateBookingMutation,
-  useCancelBookingMutation
+  useCancelBookingMutation,
+  useCreateContactMutation,
 } = api;
