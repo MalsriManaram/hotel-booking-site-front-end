@@ -1,10 +1,12 @@
 import { useState } from "react";
 import { Link } from "react-router";
-import { Bot, MessageSquare, RotateCcw, Send, Sparkles, Star, X } from "lucide-react";
+import { Compass, RotateCcw, Send, Sparkles, Star, X } from "lucide-react";
 import { useSendConciergeMessageMutation } from "@/lib/api";
 import { useCurrency } from "@/lib/currency";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+
+const FALLBACK_HOTEL_IMAGE = "/assets/grid/308797093.jpg";
 
 const STARTER_QUESTIONS = [
   "Romantic stay in Paris under $250",
@@ -34,7 +36,7 @@ function renderFormattedText(text) {
 
 const INITIAL_GREETING = {
   role: "assistant",
-  text: "Welcome to **StayLux AI Concierge** (powered by Google Gemini)! Ask me for hotel recommendations, side-by-side comparisons, multi-day itineraries, or active promo codes.",
+  text: "Welcome to **StayLux Concierge**! Ask me for bespoke hotel matches, side-by-side suite comparisons, 3-day city itineraries, or privilege promo codes.",
   hotels: [],
 };
 
@@ -42,7 +44,6 @@ const AIConcierge = () => {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState("");
   const [interactionId, setInteractionId] = useState(null);
-  const [providerMode, setProviderMode] = useState(null);
   const [messages, setMessages] = useState([INITIAL_GREETING]);
 
   const [sendMessage, { isLoading }] = useSendConciergeMessageMutation();
@@ -72,9 +73,6 @@ const AIConcierge = () => {
       if (res.interactionId) {
         setInteractionId(res.interactionId);
       }
-      if (res.provider) {
-        setProviderMode(res.provider);
-      }
 
       setMessages((prev) => [
         ...prev,
@@ -89,7 +87,7 @@ const AIConcierge = () => {
         ...prev,
         {
           role: "assistant",
-          text: "I couldn't reach the concierge server right now. Please make sure the backend is running!",
+          text: "Our concierge service is momentarily unreachable. You can still browse all hotels or reach our 24/7 WhatsApp desk!",
           hotels: [],
         },
       ]);
@@ -97,24 +95,22 @@ const AIConcierge = () => {
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-50">
+    <div className="fixed bottom-4 right-4 z-40">
       {open ? (
-        <div className="w-[350px] sm:w-[400px] h-[530px] bg-white border border-gray-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
+        <div className="w-[calc(100vw-2rem)] sm:w-[390px] h-[min(500px,74vh)] bg-white border border-neutral-200 rounded-2xl shadow-2xl flex flex-col overflow-hidden">
           {/* Header */}
-          <div className="bg-black text-white px-4 py-3.5 flex items-center justify-between">
+          <div className="bg-neutral-950 text-white px-4 py-3 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="p-1.5 rounded-lg bg-amber-400 text-black">
-                <Bot className="h-5 w-5" />
+              <div className="p-1.5 rounded-xl bg-amber-400 text-neutral-950">
+                <Compass className="h-4 w-4" />
               </div>
               <div>
                 <h3 className="font-bold text-sm flex items-center gap-1">
-                  StayLux AI Concierge
+                  StayLux Concierge
                   <Sparkles className="h-3.5 w-3.5 text-amber-400" />
                 </h3>
-                <p className="text-[11px] text-gray-300">
-                  {providerMode === "gemini-3.8-flash"
-                    ? "Google Gemini 3.8 Flash • Multi-Turn Memory"
-                    : "Smart Property Advisor & Trip Planner"}
+                <p className="text-[11px] text-neutral-400">
+                  24/7 Bespoke Travel & Suite Advisor
                 </p>
               </div>
             </div>
@@ -123,23 +119,24 @@ const AIConcierge = () => {
               <button
                 type="button"
                 onClick={handleResetChat}
-                title="Start new conversation"
-                className="text-gray-400 hover:text-white p-1"
+                title="Reset conversation"
+                className="text-neutral-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10"
               >
                 <RotateCcw className="h-4 w-4" />
               </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
-                className="text-gray-400 hover:text-white p-1"
+                aria-label="Close Concierge"
+                className="text-neutral-400 hover:text-white p-1.5 rounded-lg hover:bg-white/10"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
           </div>
 
           {/* Messages */}
-          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-gray-50/70">
+          <div className="flex-1 overflow-y-auto p-4 space-y-3 bg-neutral-50">
             {messages.map((m, idx) => (
               <div
                 key={idx}
@@ -150,14 +147,13 @@ const AIConcierge = () => {
                 <div
                   className={`max-w-[88%] rounded-2xl px-3.5 py-2.5 text-xs sm:text-sm space-y-1 ${
                     m.role === "user"
-                      ? "bg-black text-white rounded-br-sm"
-                      : "bg-white border border-gray-200 text-gray-800 rounded-bl-sm shadow-sm"
+                      ? "bg-neutral-950 text-white rounded-br-sm"
+                      : "bg-white border border-neutral-200 text-neutral-800 rounded-bl-sm shadow-xs"
                   }`}
                 >
                   {renderFormattedText(m.text)}
                 </div>
 
-                {/* Recommended Hotel Cards */}
                 {m.hotels?.length > 0 && (
                   <div className="w-[88%] space-y-2 mt-2">
                     {m.hotels.map((h) => (
@@ -165,25 +161,29 @@ const AIConcierge = () => {
                         key={h._id}
                         to={`/hotels/${h._id}`}
                         onClick={() => setOpen(false)}
-                        className="flex items-center gap-2.5 bg-white border rounded-xl p-2 shadow-sm hover:border-amber-500 transition-colors"
+                        className="flex items-center gap-2.5 bg-white border border-neutral-200 rounded-xl p-2 shadow-xs hover:border-amber-500 transition-colors"
                       >
                         <img
-                          src={h.image}
+                          src={h.image || FALLBACK_HOTEL_IMAGE}
                           alt={h.name}
-                          className="w-14 h-14 rounded-lg object-cover shrink-0"
+                          onError={(e) => {
+                            e.currentTarget.onerror = null;
+                            e.currentTarget.src = FALLBACK_HOTEL_IMAGE;
+                          }}
+                          className="w-12 h-12 rounded-lg object-cover shrink-0"
                         />
                         <div className="min-w-0 flex-1">
-                          <p className="font-semibold text-xs truncate">
+                          <p className="font-semibold text-xs truncate text-neutral-900">
                             {h.name}
                           </p>
-                          <p className="text-[11px] text-muted-foreground truncate">
+                          <p className="text-[11px] text-neutral-500 truncate">
                             {h.location}
                           </p>
                           <div className="flex items-center justify-between mt-0.5">
                             <span className="text-xs font-bold text-amber-700">
                               {formatPrice(h.price)}/night
                             </span>
-                            <span className="text-[11px] flex items-center gap-0.5">
+                            <span className="text-[11px] flex items-center gap-0.5 text-neutral-700">
                               <Star className="h-3 w-3 fill-amber-400 text-amber-400" />
                               {h.rating || "New"}
                             </span>
@@ -197,12 +197,11 @@ const AIConcierge = () => {
             ))}
 
             {isLoading && (
-              <div className="text-xs text-muted-foreground italic px-2">
-                Gemini is thinking...
+              <div className="text-xs text-neutral-500 italic px-2">
+                Curating recommendations...
               </div>
             )}
 
-            {/* Quick Starter Chips */}
             {messages.length <= 2 && (
               <div className="flex flex-wrap gap-1.5 pt-2">
                 {STARTER_QUESTIONS.map((q) => (
@@ -210,7 +209,7 @@ const AIConcierge = () => {
                     key={q}
                     type="button"
                     onClick={() => handleAsk(q)}
-                    className="text-[11px] bg-white border border-gray-200 hover:border-amber-400 text-gray-700 px-2.5 py-1 rounded-full transition-colors text-left"
+                    className="text-[11px] bg-white border border-neutral-200 hover:border-amber-500 text-neutral-700 px-2.5 py-1 rounded-full transition-colors text-left"
                   >
                     {q}
                   </button>
@@ -225,19 +224,19 @@ const AIConcierge = () => {
               e.preventDefault();
               handleAsk();
             }}
-            className="p-3 bg-white border-t flex gap-2"
+            className="p-3 bg-white border-t border-neutral-200 flex gap-2"
           >
             <Input
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask Gemini about hotels, trips, promos..."
-              className="text-sm h-10"
+              placeholder="Ask StayLux Concierge..."
+              className="text-sm h-10 bg-white text-neutral-950"
             />
             <Button
               type="submit"
               size="icon"
               disabled={isLoading || !input.trim()}
-              className="h-10 w-10 shrink-0 bg-black hover:bg-neutral-800"
+              className="h-10 w-10 shrink-0 bg-neutral-950 hover:bg-neutral-800 text-white"
             >
               <Send className="h-4 w-4" />
             </Button>
@@ -246,10 +245,10 @@ const AIConcierge = () => {
       ) : (
         <Button
           onClick={() => setOpen(true)}
-          className="h-14 px-5 rounded-full bg-black hover:bg-neutral-800 text-white shadow-2xl gap-2.5 border border-amber-400/40"
+          className="h-11 px-4 rounded-full bg-neutral-950 hover:bg-neutral-800 text-white shadow-xl gap-2 border border-amber-400/50"
         >
-          <MessageSquare className="h-5 w-5 text-amber-400" />
-          <span className="font-semibold text-sm">Gemini Concierge</span>
+          <Sparkles className="h-4 w-4 text-amber-400" />
+          <span className="font-semibold text-xs sm:text-sm">Concierge</span>
         </Button>
       )}
     </div>

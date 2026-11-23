@@ -85,7 +85,7 @@ const bookingSchema = z
 const PAYHERE_SANDBOX_MERCHANT_ID =
   import.meta.env.VITE_PAYHERE_MERCHANT_ID || "";
 
-const BookingDialog = ({ hotel, defaultRoomType = "single" }) => {
+const BookingDialog = ({ hotel, defaultRoomType = "single", triggerClassName = "" }) => {
   const { isSignedIn, user } = useUser();
   const navigate = useNavigate();
   const { formatPrice } = useCurrency();
@@ -263,7 +263,7 @@ const BookingDialog = ({ hotel, defaultRoomType = "single" }) => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="lg" onClick={handleTriggerClick}>
+        <Button size="lg" className={triggerClassName} onClick={handleTriggerClick}>
           Book Now
         </Button>
       </DialogTrigger>

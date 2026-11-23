@@ -15,48 +15,95 @@ const Footer = () => {
   const isAdmin = user?.publicMetadata?.role === "admin";
 
   return (
-    <footer className="bg-black text-white py-10">
+    <footer className="bg-neutral-950 text-white pt-12 pb-20 md:pb-12 border-t border-white/10">
       <div className="max-w-7xl mx-auto px-6 lg:px-8">
-        <div className="grid grid-cols-1 md:grid-cols-4 text-center md:text-left justify-items-center md:justify-items-start gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 text-center sm:text-left gap-8">
           {/* Brand */}
           <div className="space-y-3">
-            <div className="flex items-center justify-center md:justify-start gap-3">
-              <img className="h-12 w-auto" src={logo} alt="StayLux Icon" />
-              <h2 className="text-2xl font-bold">StayLux</h2>
+            <div className="flex items-center justify-center sm:justify-start gap-3">
+              <img className="h-11 w-auto" src={logo} alt="StayLux Icon" />
+              <h2 className="font-display text-2xl font-bold">StayLux</h2>
             </div>
-            <p className="text-sm text-gray-400 leading-relaxed">
-              AI-powered luxury staycations worldwide. Reserve effortlessly with instant WhatsApp Store confirmation.
+            <p className="text-sm text-neutral-400 leading-relaxed">
+              Curated luxury hotels and suites worldwide. Discover by atmosphere
+              and confirm effortlessly via our 24/7 WhatsApp Store desk.
             </p>
           </div>
 
-          {/* Quick Links */}
+          {/* Discover */}
           <div>
-            <h2 className="text-lg font-semibold">Quick Links</h2>
-            <ul className="mt-3 text-gray-400 space-y-2 text-sm">
+            <h2 className="text-sm uppercase tracking-wider font-bold text-amber-400">
+              Discover
+            </h2>
+            <ul className="mt-3 text-neutral-400 space-y-2 text-sm">
               <li>
-                <Link to="/" className="hover:text-white">
+                <Link to="/hotels" className="hover:text-white transition-colors">
+                  Explore All Hotels
+                </Link>
+              </li>
+              <li>
+                <Link
+                  to="/destinations"
+                  className="hover:text-white transition-colors"
+                >
+                  Destinations & Guides
+                </Link>
+              </li>
+              <li>
+                <Link to="/offers" className="hover:text-white transition-colors">
+                  Exclusive Offers & Codes
+                </Link>
+              </li>
+              <li>
+                <Link to="/faq" className="hover:text-white transition-colors">
+                  Help Center & FAQ
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h2 className="text-sm uppercase tracking-wider font-bold text-amber-400">
+              Company
+            </h2>
+            <ul className="mt-3 text-neutral-400 space-y-2 text-sm">
+              <li>
+                <Link to="/" className="hover:text-white transition-colors">
                   Home
                 </Link>
               </li>
               <li>
-                <Link to="/about-us" className="hover:text-white">
-                  About Us
+                <Link
+                  to="/about-us"
+                  className="hover:text-white transition-colors"
+                >
+                  About StayLux
                 </Link>
               </li>
               <li>
-                <Link to="/contact-us" className="hover:text-white">
-                  Contact Us
+                <Link
+                  to="/contact-us"
+                  className="hover:text-white transition-colors"
+                >
+                  Contact Support
                 </Link>
               </li>
               {isAdmin && (
                 <>
                   <li>
-                    <Link to="/hotels/create" className="hover:text-white">
+                    <Link
+                      to="/hotels/create"
+                      className="hover:text-white transition-colors"
+                    >
                       Create Hotel
                     </Link>
                   </li>
                   <li>
-                    <Link to="/admin" className="text-amber-400 hover:text-amber-300">
+                    <Link
+                      to="/admin"
+                      className="text-amber-400 hover:text-amber-300 font-medium"
+                    >
                       Admin Control Center
                     </Link>
                   </li>
@@ -65,32 +112,30 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Contact & WhatsApp Store */}
-          <div className="space-y-2">
-            <h2 className="text-lg font-semibold">Support & WhatsApp Store</h2>
-            <p className="text-sm text-gray-400">Email: support@staylux.com</p>
-            <p className="text-sm text-gray-400">Phone: +94 77 123 1234</p>
+          {/* Support & WhatsApp Store */}
+          <div className="space-y-2.5">
+            <h2 className="text-sm uppercase tracking-wider font-bold text-amber-400">
+              Reservations Desk
+            </h2>
+            <p className="text-sm text-neutral-400">support@staylux.com</p>
+            <p className="text-sm text-neutral-400">+94 77 123 1234</p>
             <a
               href="https://wa.me/94771231234?text=Hello%20StayLux!%20I%20would%20like%20assistance%20with%20a%20hotel%20reservation."
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-xs font-semibold bg-green-600 hover:bg-green-700 text-white px-3.5 py-2 rounded-lg mt-1 transition-colors"
+              className="inline-flex items-center gap-2 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-lg transition-colors"
             >
               <FaWhatsapp className="h-4 w-4" />
               Chat on WhatsApp Store
             </a>
-          </div>
 
-          {/* Social Media */}
-          <div>
-            <h2 className="text-lg font-semibold">Follow Us</h2>
-            <div className="flex space-x-4 mt-3">
+            <div className="flex justify-center sm:justify-start space-x-4 pt-2">
               <a
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook"
-                className="text-gray-400 hover:text-white text-xl"
+                className="text-neutral-400 hover:text-white text-lg"
               >
                 <FaFacebookF />
               </a>
@@ -99,7 +144,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Twitter"
-                className="text-gray-400 hover:text-white text-xl"
+                className="text-neutral-400 hover:text-white text-lg"
               >
                 <FaTwitter />
               </a>
@@ -108,7 +153,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram"
-                className="text-gray-400 hover:text-white text-xl"
+                className="text-neutral-400 hover:text-white text-lg"
               >
                 <FaInstagram />
               </a>
@@ -117,7 +162,7 @@ const Footer = () => {
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="LinkedIn"
-                className="text-gray-400 hover:text-white text-xl"
+                className="text-neutral-400 hover:text-white text-lg"
               >
                 <FaLinkedinIn />
               </a>
@@ -125,8 +170,9 @@ const Footer = () => {
           </div>
         </div>
 
-        <div className="border-t border-gray-800 mt-8 pt-6 text-center text-gray-500 text-xs">
-          &copy; {new Date().getFullYear()} StayLux Hospitality. All rights reserved.
+        <div className="border-t border-neutral-800 mt-10 pt-6 text-center text-neutral-500 text-xs">
+          &copy; {new Date().getFullYear()} StayLux Hospitality. All rights
+          reserved.
         </div>
       </div>
     </footer>

@@ -147,6 +147,10 @@ const MyBookings = () => {
                       <img
                         src={booking?.hotelId?.image || "/assets/hero/hero.jpg"}
                         alt={booking?.hotelId?.name || "Hotel"}
+                        onError={(e) => {
+                          e.currentTarget.onerror = null;
+                          e.currentTarget.src = "/assets/hero/hero.jpg";
+                        }}
                         className="w-full h-full object-cover"
                       />
                       {booking.bookingRef && (

@@ -23,7 +23,7 @@ import {
 
 const HotelReviews = ({ hotelId, hotelRating, hotelReviewsCount }) => {
   const { isSignedIn, user } = useUser();
-  const { data, isLoading } = useGetReviewsByHotelQuery(hotelId, {
+  const { data, isLoading, isError } = useGetReviewsByHotelQuery(hotelId, {
     skip: !hotelId,
   });
   const [upsertReview, { isLoading: isSubmitting }] = useUpsertReviewMutation();
@@ -239,8 +239,10 @@ const HotelReviews = ({ hotelId, hotelRating, hotelReviewsCount }) => {
         {/* Written Reviews Feed */}
         <div className="lg:col-span-2 space-y-4">
           {isLoading ? (
-            <p className="text-sm text-muted-foreground">Loading reviews...</p>
-          ) : reviews.length === 0 ? (
+            <Card className="rounded-2xl p-8 text-center bg-white">
+              <p className="text-sm text-muted-foreground">Loading guest reviews...</p>
+            </Card>
+          ) : isError || reviews.length === 0 ? (
             <Card className="rounded-2xl p-8 text-center bg-gray-50/70 border-dashed">
               <p className="font-medium text-gray-700">
                 No written guest reviews yet for this property.
