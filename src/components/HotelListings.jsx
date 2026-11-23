@@ -1,27 +1,68 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-
-// components
+import { useSelector, useDispatch } from "react-redux";
+import { useUser } from "@clerk/clerk-react";
 import HotelCard from "./HotelCard";
 import LocationTab from "./LocationTab";
-
-// hooks
-import { useSelector } from "react-redux";
-import { useGetHotelsForSearchQueryQuery } from "@/lib/api";
+import {
+  useGetHotelsForSearchQueryQuery,
+  useGetHotelLocationsQuery,
+  useGetWishlistQuery,
+} from "@/lib/api";
+import { submit, resetSearch } from "@/lib/features/searchSlice";
 import { Skeleton } from "./ui/skeleton";
+import { Button } from "./ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+
+const AMENITY_FILTERS = [
+  "Free Wi-Fi",
+  "Restaurant",
+  "Swimming Pool",
+  "Spa & Wellness",
+  "Airport Shuttle",
+];
 
 const HotelListings = () => {
-  // get the search value from the store
+  const dispatch = useDispatch();
+  const { isSignedIn } = useUser();
   const searchData = useSelector((state) => state.search.searchData);
 
-  const locations = ["ALL", "France", "Italy", "Australia", "Japan"];
   const [selectedLocation, setSelectedLocation] = useState("ALL");
 
-  const { description, rating, location: searchLocation, price } = searchData;
+  const { data: locData } = useGetHotelLocationsQuery();
+  const locations = locData?.locations || [
+    "ALL",
+    "France",
+    "Italy",
+    "Australia",
+    "Japan",
+  ];
 
-  // logic to fetch hotels based on search criteria
+  const { data: wishlistData } = useGetWishlistQuery(undefined, {
+    skip: !isSignedIn,
+  });
+  const savedIds = new Set(wishlistData?.hotelIds || []);
+
+  const {
+    query,
+    description,
+    rating,
+    location: searchLocation,
+    price,
+    amenities = [],
+    checkIn,
+    checkOut,
+    sortBy = "ai_match",
+  } = searchData;
+
   const locationForQuery =
-    selectedLocation === "ALL" ? undefined : selectedLocation;
+    searchLocation || (selectedLocation === "ALL" ? undefined : selectedLocation);
 
   const {
     data: hotels,
@@ -29,145 +70,166 @@ const HotelListings = () => {
     isError,
     error,
   } = useGetHotelsForSearchQueryQuery({
+    query,
     description,
     rating,
-    location: searchLocation || locationForQuery,
+    location: locationForQuery,
     price,
+    amenities,
+    checkIn,
+    checkOut,
+    sortBy,
   });
 
-  // function to handle the selected location
-  const handleSelectedLocation = (location) => {
-    setSelectedLocation(location);
+  const handleSelectedLocation = (loc) => {
+    setSelectedLocation(loc);
+    if (searchLocation) {
+      dispatch(submit({ location: "" }));
+    }
   };
 
-  // filter the hotels based on the selected location
-  const hotelList = hotels?.data || hotels || [];
-  const filteredHotels =
-    selectedLocation === "ALL"
-      ? hotelList
-      : hotelList.filter(({ hotel }) => {
-          return hotel.location
-            .toLowerCase()
-            .includes(
-              searchLocation?.toLowerCase() || selectedLocation.toLowerCase()
-            );
-        });
+  const toggleAmenity = (amenity) => {
+    const current = Array.isArray(amenities) ? amenities : [];
+    const next = current.includes(amenity)
+      ? current.filter((a) => a !== amenity)
+      : [...current, amenity];
+    dispatch(submit({ amenities: next }));
+  };
 
-  // if the data is loading, return a loading UI
-  if (isLoading) {
-    return (
-      <section className="px-8 py-8 lg:py-16">
-        <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Top trending hotels worldwide
+  const handleSortChange = (val) => {
+    dispatch(submit({ sortBy: val }));
+  };
+
+  const hotelList = hotels?.data || hotels || [];
+  const hasSearchQuery = Boolean(
+    query || description || rating || searchLocation || price || amenities?.length
+  );
+
+  return (
+    <section className="px-6 md:px-8 py-10 lg:py-16 max-w-7xl mx-auto">
+      <div className="flex flex-col md:flex-row md:items-end justify-between mb-8 gap-4">
+        <div>
+          <h2 className="text-3xl md:text-4xl font-bold mb-2">
+            {hasSearchQuery
+              ? "AI-Matched Stays For You"
+              : "Top Trending Hotels Worldwide"}
           </h2>
-          <p className="text-lg text-muted-foreground">
-            Discover the most trending hotels worldwide for an unforgettable
-            experience.
+          <p className="text-base md:text-lg text-muted-foreground">
+            {hasSearchQuery
+              ? `Showing ${hotelList.length} curated ${
+                  hotelList.length === 1 ? "property" : "properties"
+                } matching your preferences.`
+              : "Discover luxury hand-picked properties with instant WhatsApp reservation."}
           </p>
         </div>
-        <div className="flex items-center gap-x-1 md:gap-x-4">
-          {locations.map((location, i) => {
+
+        {/* Sort Control */}
+        <div className="flex items-center gap-3 self-start md:self-auto">
+          <span className="text-sm text-muted-foreground whitespace-nowrap">
+            Sort by:
+          </span>
+          <Select value={sortBy} onValueChange={handleSortChange}>
+            <SelectTrigger className="w-48 bg-white">
+              <SelectValue placeholder="Sort results" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="ai_match">AI Best Match</SelectItem>
+              <SelectItem value="price_asc">Price: Low to High</SelectItem>
+              <SelectItem value="price_desc">Price: High to Low</SelectItem>
+              <SelectItem value="rating_desc">Highest Guest Rating</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      {/* Dynamic Location Tabs + Quick Amenity Chips */}
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6">
+        <div className="flex items-center flex-wrap gap-2">
+          {locations.map((loc) => (
+            <LocationTab
+              key={loc}
+              selectedLocation={selectedLocation}
+              name={loc}
+              onClick={handleSelectedLocation}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center flex-wrap gap-1.5">
+          {AMENITY_FILTERS.map((am) => {
+            const active = (amenities || []).includes(am);
             return (
-              <LocationTab
-                key={i}
-                selectedLocation={selectedLocation}
-                name={location}
-                onClick={handleSelectedLocation}
-              />
+              <button
+                key={am}
+                type="button"
+                onClick={() => toggleAmenity(am)}
+                className={`text-xs px-3 py-1.5 rounded-full border transition-colors ${
+                  active
+                    ? "bg-black text-white border-black"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400"
+                }`}
+              >
+                {am}
+              </button>
             );
           })}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-4">
+      </div>
+
+      {isLoading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
           {[...Array(4)].map((_, i) => (
             <div key={i} className="space-y-4">
-              <Skeleton className="h-48 w-full rounded-lg" />
+              <Skeleton className="h-52 w-full rounded-2xl" />
               <Skeleton className="h-4 w-3/4" />
               <Skeleton className="h-4 w-1/2" />
               <Skeleton className="h-4 w-1/4" />
             </div>
           ))}
         </div>
-      </section>
-    );
-  }
-  // if there is an error, return a error UI
-  if (isError) {
-    return (
-      <section className="px-8 py-8 lg:py-16">
-        <div className="mb-12">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">
-            Top trending hotels worldwide
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            Discover the most trending hotels worldwide for an unforgettable
-            experience.
+      ) : isError ? (
+        <div className="rounded-2xl border border-red-200 bg-red-50 p-6 text-center my-6">
+          <p className="text-red-600 font-medium">
+            Unable to load hotel listings ({error?.data?.message || "Check backend connection"}).
           </p>
         </div>
-        <div className="flex items-center gap-x-1 md:gap-x-4">
-          {locations.map((location, i) => {
-            return (
-              <LocationTab
-                key={i}
-                selectedLocation={selectedLocation}
-                name={location}
-                onClick={handleSelectedLocation}
-              />
-            );
-          })}
-        </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-4">
-          <p className="text-red-500">{error?.message}</p>
-        </div>
-      </section>
-    );
-  }
-
-  return (
-    <section className="px-8 py-8 lg:py-16">
-      <div className="mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">
-          Top trending hotels worldwide
-        </h2>
-
-        <p className="text-lg text-muted-foreground">
-          Discover the most trending hotels worldwide for an unforgettable
-          experience.
-        </p>
-      </div>
-      <div className="flex items-center gap-x-1 md:gap-x-4">
-        {locations.map((location, i) => {
-          return (
-            <LocationTab
-              key={i}
-              selectedLocation={selectedLocation}
-              name={location}
-              onClick={handleSelectedLocation}
-            />
-          );
-        })}
-      </div>
-      <div
-        key={selectedLocation}
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mt-4"
-      >
-        {filteredHotels?.length > 0 ? (
-          filteredHotels.map(({ hotel, confidence }, index) => (
+      ) : hotelList.length > 0 ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-4">
+          {hotelList.map(({ hotel, confidence }) => (
             <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 20 }}
+              key={hotel._id}
+              initial={{ opacity: 0, y: 18 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5 }}
+              transition={{ duration: 0.4 }}
             >
-              <HotelCard hotel={hotel} confidence={confidence} />
+              <HotelCard
+                hotel={hotel}
+                confidence={confidence}
+                isSaved={savedIds.has(String(hotel._id))}
+                showConfidence={hasSearchQuery}
+              />
             </motion.div>
-          ))
-        ) : (
-          <p className="text-lg text-gray-500 col-span-full py-5 px-2">
-            No hotels found matching your search criteria.
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-2xl border bg-gray-50 p-10 text-center my-6 space-y-3">
+          <p className="text-lg font-medium text-gray-700">
+            No hotels matched your exact filters.
           </p>
-        )}
-      </div>
+          <p className="text-sm text-muted-foreground">
+            Try relaxing your price limit, switching destinations, or clearing filters.
+          </p>
+          <Button
+            variant="outline"
+            onClick={() => {
+              setSelectedLocation("ALL");
+              dispatch(resetSearch());
+            }}
+          >
+            Clear All Filters
+          </Button>
+        </div>
+      )}
     </section>
   );
 };

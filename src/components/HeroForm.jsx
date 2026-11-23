@@ -1,134 +1,213 @@
-import { z } from "zod";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { useForm } from "react-hook-form";
-import { Sparkles } from "lucide-react";
-import { useDispatch } from "react-redux";
-import { submit } from "@/lib/features/searchSlice";
-
-import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormMessage,
-} from "@/components/ui/form";
+import { useState } from "react";
+import { Sparkles, RotateCcw, SlidersHorizontal, Search } from "lucide-react";
+import { useDispatch, useSelector } from "react-redux";
+import { submit, resetSearch } from "@/lib/features/searchSlice";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-// form validation schema
-const formSchema = z.object({
-  description: z.string().min(1, { message: "Your description is required" }),
-  rating: z.number().min(1, { message: "Rating is required" }).max(5, { message: "Rating cannot be more than 5" }),
-  location: z.string().min(1, { message: "Location is required" }),
-  price: z.number().min(1, { message: "Price must be at least 1" }),
-});
-
+const QUICK_PROMPTS = [
+  "Romantic hotel in Paris under $250",
+  "Harbour view luxury stay in Sydney",
+  "Peaceful garden retreat in Kyoto",
+  "Top rated city suite in Tokyo",
+];
 
 const HeroForm = () => {
+  const dispatch = useDispatch();
+  const currentSearch = useSelector((state) => state.search.searchData);
 
-    const form = useForm ({
-            resolver: zodResolver(formSchema),
-        });
+  const [query, setQuery] = useState(currentSearch.query || "");
+  const [location, setLocation] = useState(currentSearch.location || "");
+  const [price, setPrice] = useState(currentSearch.price || "");
+  const [rating, setRating] = useState(currentSearch.rating || "");
+  const [checkIn, setCheckIn] = useState(currentSearch.checkIn || "");
+  const [checkOut, setCheckOut] = useState(currentSearch.checkOut || "");
+  const [showAdvanced, setShowAdvanced] = useState(false);
 
-        const dispatch = useDispatch();
-        
-        /// function to handle the search form submission
-        const handleSearch = (data) => {
-            dispatch(submit(data)); 
-        };
-          
-
-    return (
-        <main>
-            <Form {...form} >
-                <form action="" onSubmit={form.handleSubmit(handleSearch)}>
-                    <div className="grid md:grid-flow-col md:grid-rows-1 gap-4 items-center p-5 mt-40 md:mt-8 md:mb-20 lg:mb-12 w-full max-w-7xl min-w-[350px] h-fit md:h-32 bg-gray-100 drop-shadow-xl rounded-xl">
-                    <FormField
-                        control={form.control}
-                        name="description"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormControl>
-                                <Input 
-                                 className="h-12 lg:w-96 lg:text-lg text-black placeholder:text-gray-500 border-none outline-none focus:border-none focus:outline-none focus-visible:ring-0"
-                                 placeholder="What kind of hotel are you looking for?" {...field} />
-                            </FormControl>
-                            <FormMessage className="md:absolute md:ml-2" />
-                            </FormItem>
-                        )}
-                    />
-                     <FormField
-                        control={form.control}
-                        name="rating"
-                        
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormControl>
-                                <Input type="number" placeholder="Hotel rating"
-                                        step="0.01"
-                                        max="5"
-                                        className="h-12 lg:text-lg text-black placeholder:text-gray-500 border-none outline-none focus:border-none focus:outline-none focus-visible:ring-0"
-                                        onChange={(e) => {
-                                        field.onChange(parseFloat(e.target.value)|| 0);
-                                    }} 
-                                    value={field.value}
-                                />
-                            </FormControl>
-                            <FormMessage className="md:absolute md:ml-2" />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="location"
-                        
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormControl>
-                                <Input placeholder="Hotel location"
-                                 className=" h-12 lg:text-lg text-black placeholder:text-gray-500 border-none outline-none focus:border-none focus:outline-none focus-visible:ring-0"
-                                 {...field} />
-                            </FormControl>
-                            <FormMessage className="md:absolute md:ml-2" />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="price"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormControl>
-                                <Input type="number" placeholder="Price per night"
-                                    step="0.01"
-                                    className="h-12 lg:text-lg text-black placeholder:text-gray-500 border-none outline-none focus:border-none focus:outline-none focus-visible:ring-0"
-                                    onChange={(e) => {
-                                    field.onChange(parseFloat(e.target.value)|| 0);
-                                }} 
-                                value={field.value}
-                                />
-                            </FormControl>
-                            <FormMessage className="md:absolute md:ml-2" />
-                            </FormItem>
-                        )}
-                    />
-                    <Button
-                        type="submit"
-                        className="rounded-md w-full md:w-44 gap-x-2 lg:h-12"
-                    >
-                        <Sparkles
-                        style={{ width: "20px", height: "20px" }}
-                        className="mr-2 animate-pulse text-sky-400"
-                        />
-                        <span className="lg:text-lg">AI Search</span>
-                    </Button>
-                
-                    </div>
-
-                </form>
-            </Form>
-        </main>
+  const handleSearch = (e) => {
+    e.preventDefault();
+    dispatch(
+      submit({
+        query: query.trim(),
+        description: query.trim(),
+        location: location.trim(),
+        price: price ? Number(price) : "",
+        rating: rating ? Number(rating) : "",
+        checkIn,
+        checkOut,
+      })
     );
+  };
+
+  const handleQuickPrompt = (promptText) => {
+    setQuery(promptText);
+    dispatch(
+      submit({
+        query: promptText,
+        description: promptText,
+        location: "",
+        price: "",
+        rating: "",
+      })
+    );
+  };
+
+  const handleReset = () => {
+    setQuery("");
+    setLocation("");
+    setPrice("");
+    setRating("");
+    setCheckIn("");
+    setCheckOut("");
+    dispatch(resetSearch());
+  };
+
+  const hasActiveFilters = Boolean(
+    query || location || price || rating || checkIn || checkOut
+  );
+
+  return (
+    <div className="w-full max-w-5xl mt-10 md:mt-8 mb-12 px-2">
+      <form
+        onSubmit={handleSearch}
+        className="bg-white/95 backdrop-blur-md text-black p-4 md:p-5 rounded-2xl shadow-2xl border border-white/40 space-y-3"
+      >
+        {/* Main Natural-Language AI Search Row */}
+        <div className="flex flex-col md:flex-row gap-3 items-stretch md:items-center">
+          <div className="relative flex-1">
+            <Search className="h-5 w-5 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+            <Input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Ask AI naturally — e.g. 'Romantic hotel in Paris under $250 with Wi-Fi'"
+              className="h-12 pl-11 text-base text-black placeholder:text-gray-500 border-gray-200 focus-visible:ring-amber-500"
+            />
+          </div>
+
+          <div className="flex gap-2">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowAdvanced((prev) => !prev)}
+              className="h-12 px-3.5 border-gray-200 text-gray-700 hover:bg-gray-100"
+              title="Toggle optional filters"
+            >
+              <SlidersHorizontal className="h-4 w-4 mr-2" />
+              Filters
+            </Button>
+
+            {hasActiveFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                onClick={handleReset}
+                className="h-12 px-3 text-gray-600 hover:text-black"
+                title="Reset search"
+              >
+                <RotateCcw className="h-4 w-4" />
+              </Button>
+            )}
+
+            <Button
+              type="submit"
+              className="h-12 px-6 rounded-xl bg-black hover:bg-neutral-800 text-white font-semibold gap-2 flex-1 md:flex-none"
+            >
+              <Sparkles className="h-4 w-4 text-amber-400 animate-pulse" />
+              <span>AI Search</span>
+            </Button>
+          </div>
+        </div>
+
+        {/* Optional Structured Filters Row */}
+        {showAdvanced && (
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 pt-3 border-t border-gray-200">
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">
+                Destination
+              </label>
+              <Input
+                value={location}
+                onChange={(e) => setLocation(e.target.value)}
+                placeholder="City or Country"
+                className="h-10 text-sm text-black"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">
+                Max Price (USD / night)
+              </label>
+              <Input
+                type="number"
+                min="1"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                placeholder="e.g. 250"
+                className="h-10 text-sm text-black"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">
+                Min Rating (1–5)
+              </label>
+              <Input
+                type="number"
+                min="1"
+                max="5"
+                step="0.1"
+                value={rating}
+                onChange={(e) => setRating(e.target.value)}
+                placeholder="e.g. 4.5"
+                className="h-10 text-sm text-black"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">
+                Check-In Date
+              </label>
+              <Input
+                type="date"
+                min={new Date().toISOString().slice(0, 10)}
+                value={checkIn}
+                onChange={(e) => setCheckIn(e.target.value)}
+                className="h-10 text-sm text-black"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-medium text-gray-500 mb-1 block">
+                Check-Out Date
+              </label>
+              <Input
+                type="date"
+                min={checkIn || new Date().toISOString().slice(0, 10)}
+                value={checkOut}
+                onChange={(e) => setCheckOut(e.target.value)}
+                className="h-10 text-sm text-black"
+              />
+            </div>
+          </div>
+        )}
+
+        {/* Quick AI Inspiration Pills */}
+        <div className="flex flex-wrap items-center gap-2 pt-1">
+          <span className="text-xs font-medium text-gray-500">Try:</span>
+          {QUICK_PROMPTS.map((item) => (
+            <button
+              key={item}
+              type="button"
+              onClick={() => handleQuickPrompt(item)}
+              className="text-xs bg-gray-100 hover:bg-amber-100 hover:text-amber-900 text-gray-700 px-2.5 py-1 rounded-full transition-colors"
+            >
+              {item}
+            </button>
+          ))}
+        </div>
+      </form>
+    </div>
+  );
 };
 
 export default HeroForm;
